@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti-Ragging Quiz for College Students</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 90%;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-title {
+            font-size: 2.5em;
+            color: #e74c3c;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .quiz-subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .registration-form, .quiz-content, .results-screen {
+            display: none;
+        }
+
+        .registration-form.active, .quiz-content.active, .results-screen.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-right: 10px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .warning-count {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .case-study {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 15px;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option:hover {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+
+        .option.selected {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        .warning-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .warning-icon {
+            font-size: 3em;
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+
+        .disqualified {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+
+        .results-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .score {
+            font-size: 3em;
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: #e1e5e9;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .ai-detection-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .anti-ragging-info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .google-form-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            color: #1565c0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .quiz-container {
+                box-shadow: none;
+                max-width: none;
+                width: 100%;
+                padding: 20px;
+            }
+            .btn, .warning-modal, .status-bar {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+            <h1 class="quiz-title">Anti-Ragging Awareness Quiz</h1>
+            <h1 class="quiz-title">#YaARIYouthAgainstRagging</h1>
+            
+            <p class="quiz-subtitle">Creating Safe Campus Environment for All Students</p>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="registration-form active" id="registrationForm">
+            <div class="anti-ragging-info">
+                <strong>📢 Important:</strong> This quiz tests your knowledge about anti-ragging policies, prevention measures, and creating a safe campus environment. Ragging is a serious offense and this awareness is crucial for all college students.
+            </div>
+            <form id="registrationFormElement">
+                <div class="form-group">
+                    <label for="participantName">Full Name:</label>
+                    <input type="text" id="participantName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="participantEmail">Email:</label>
+                    <input type="email" id="participantEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="collegeName">College Name:</label>
+                    <input type="text" id="collegeName" name="college" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentId">Year of Study and Class:</label>
+                    <input type="text" id="studentId" name="studentId" required>
+                </div>
+                <div class="ai-detection-warning">
+                    ⚠️ AI detection is active. Using AI tools like Gemini, ChatGPT, or similar will result in disqualification.
+                </div>
+                <button type="submit" class="btn">Start Anti-Ragging Quiz</button>
+            </form>
+        </div>
+
+        <!-- Quiz Content -->
+        <div class="quiz-content" id="quizContent">
+            <div class="status-bar">
+                <div>
+                    <span class="warning-count">Tab Switches: <span id="tabSwitchCount">0</span>/3</span>
+                    <span style="margin-left: 20px;">Question: <span id="currentQuestion">1</span>/50</span>
+                </div>
+                <div class="timer" id="timer">40:00</div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 2%"></div>
+            </div>
+
+            <div class="question-card" id="questionCard">
+                <!-- Questions will be populated here -->
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn" id="nextBtn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+                <button class="btn" id="submitBtn" onclick="submitQuiz()" style="display: none;">Submit Quiz</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-card">
+                <h2>Quiz Completed!</h2>
+                <div class="score" id="finalScore">0/50</div>
+                <p id="participantInfo"></p>
+                
+                <div class="google-form-info">
+                    <strong>📝 Submit Your Results:</strong><br>
+                    Click the button below to submit your quiz results through our official Google Form. 
+                    This will record your completion and provide you with a certificate.
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="printResults()">🖨️ Print Results</button>
+                    <button class="btn btn-secondary" onclick="saveAsPDF()">📄 Save as PDF</button>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLScmw77MiuJQDAi8YhWSNtiBtYUhkOvAsGniNANjJu6j9L8nKQ/viewform?usp=header" target="_blank" class="btn btn-success" id="submitResultsBtn">📤 Submit Your Results</a>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left;">
+                    <strong>Next Steps:</strong>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Click "Submit Your Results" to open the Google Form</li>
+                        <li>Fill in your details and quiz score in the form</li>
+                        <li>Submit the form to receive your certificate</li>
+                        <li>Keep a copy of your results for your records</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="warning-modal" id="warningModal">
+        <div class="modal-content">
+            <div class="warning-icon">⚠️</div>
+            <h3 id="modalTitle">Warning!</h3>
+            <p id="modalMessage"></p>
+            <button class="btn" onclick="closeModal()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Anti-Ragging Quiz Data (50 Questions)
+        const quizData = [
+            {
+                question: "What is ragging according to UGC regulations?",
+                options: [
+                    "Friendly interaction between seniors and juniors",
+                    "Any conduct causing physical or psychological harm to students",
+                    "College orientation activities",
+                    "Academic competition between students"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which law specifically addresses ragging in Indian educational institutions?",
+                options: [
+                    "Indian Penal Code Section 498A",
+                    "UGC Regulations on Curbing Menace of Ragging, 2009",
+                    "Right to Education Act",
+                    "Juvenile Justice Act"
+                ],
+                correct: 1
+            },
+            {
+                question: "What should you do if you witness ragging?",
+                options: [
+                    "Ignore it as it's not your business",
+                    "Join in to avoid being targeted",
+                    "Immediately report to authorities or anti-ragging committee",
+                    "Record it for social media"
+                ],
+                correct: 2
+            },
+            {
+                question: "Case Study: A senior student asks a junior to clean their room daily and calls it 'tradition'. This is:",
+                options: [
+                    "Acceptable college tradition",
+                    "Ragging that should be reported",
+                    "Character building exercise",
+                    "Normal hostel life"
+                ],
+                correct: 1,
+                caseStudy: true
+            },
+            {
+                question: "What is the punishment for ragging under UGC regulations?",
+                options: [
+                    "Warning letter only",
+                    "Suspension, expulsion, or debarring from institution",
+                    "Community service",
+                    "Fine payment"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which committee is mandatory in every educational institution to prevent ragging?",
+                options: [
+                    "Student Welfare Committee",
+                    "Anti-Ragging Committee and Squad",
+                    "Discipline Committee",
+                    "Academic Committee"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: Seniors force juniors to perform embarrassing acts during 'introduction'. What should juniors do?",
+                options: [
+                    "Comply to avoid trouble",
+                    "Refuse and report to anti-ragging committee",
+                    "Negotiate for lesser embarrassment",
+                    "Ask parents to complain"
+                ],
+                correct: 1,
+                caseStudy: true
+            },
+            {
+                question: "Ragging includes which of the following activities?",
+                options: [
+                    "Physical assault and verbal abuse",
+                    "Forced labor and financial exploitation",
+                    "Sexual harassment and psychological pressure",
+                    "All of the above"
+                ],
+                correct: 3
+            },
+            {
+                question: "What is the 24/7 UGC helpline number for reporting ragging?",
+                options: [
+                    "1098",
+                    "1800-180-5522",
+                    "100",
+                    "1091"
+                ],
+                correct: 1
+            },
+            {
+                question: "Can ragging be justified as 'character building' or 'breaking ice'?",
+                options: [
+                    "Yes, if done with good intentions",
+                    "Yes, if it's traditional",
+                    "No, ragging can never be justified",
+                    "Yes, if students consent"
+                ],
+                correct: 2
+            },
+            {
+                question: "Case Study: A group of seniors demands money from juniors for 'fresher's party fund'. This constitutes:",
+                options: [
+                    "Normal college fundraising",
+                    "Financial ragging and extortion",
+                    "Voluntary contribution",
+                    "College administration duty"
+                ],
+                correct: 1,
+                caseStudy: true
+            },
+            {
+                question: "What should be the first step when a student faces ragging?",
+                options: [
+                    "Tell parents immediately",
+                    "Confront the seniors directly",
+                    "Report to anti-ragging committee or call helpline",
+                    "Seek help from other seniors"
+                ],
+                correct: 2
+            },
+            {
+                question: "Cyber ragging includes:",
+                options: [
+                    "Online harassment and bullying",
+                    "Sharing embarrassing content without consent",
+                    "Creating fake profiles to humiliate",
+                    "All of the above"
+                ],
+                correct: 3
+            },
+            {
+                question: "Who can file a complaint against ragging?",
+                options: [
+                    "Only the victim",
+                    "Victim, witnesses, parents, or any concerned person",
+                    "Only college authorities",
+                    "Only anti-ragging committee members"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: Seniors make juniors stand in the sun for hours as 'endurance training'. This is:",
+                options: [
+                    "Physical fitness activity",
+                    "Character building exercise",
+                    "Physical ragging causing harm",
+                    "Normal college activity"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "What is the role of college administration in preventing ragging?",
+                options: [
+                    "Only investigate after complaints",
+                    "Create awareness and implement preventive measures",
+                    "Support traditional senior-junior relationships",
+                    "Ignore minor incidents"
+                ],
+                correct: 1
+            },
+            {
+                question: "Anonymous reporting of ragging is:",
+                options: [
+                    "Not allowed",
+                    "Encouraged and protected",
+                    "Only for serious cases",
+                    "Discouraged"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: A senior asks a junior to write their assignment. When refused, threatens consequences. This is:",
+                options: [
+                    "Academic help request",
+                    "Normal peer pressure",
+                    "Academic ragging and exploitation",
+                    "Mentorship activity"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "What constitutes psychological ragging?",
+                options: [
+                    "Verbal abuse and intimidation",
+                    "Social isolation and exclusion",
+                    "Threats and creating fear",
+                    "All of the above"
+                ],
+                correct: 3
+            },
+            {
+                question: "How long should anti-ragging awareness programs be conducted?",
+                options: [
+                    "Only during admission",
+                    "First week of college",
+                    "Throughout the academic year",
+                    "Only when incidents occur"
+                ],
+                correct: 2
+            },
+            {
+                question: "Case Study: Seniors force juniors to perform cultural acts against their will during college events. This is:",
+                options: [
+                    "Cultural participation",
+                    "Talent development",
+                    "Forced participation constituting ragging",
+                    "College tradition"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "What is the Supreme Court's stance on ragging?",
+                options: [
+                    "Allows controlled ragging",
+                    "Complete ban with zero tolerance",
+                    "Permits traditional practices",
+                    "Supports character building activities"
+                ],
+                correct: 1
+            },
+            {
+                question: "If someone records ragging incidents, they should:",
+                options: [
+                    "Share on social media immediately",
+                    "Use as evidence while reporting to authorities",
+                    "Blackmail the perpetrators",
+                    "Delete to avoid trouble"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: A junior is asked to address seniors with specific titles and show 'respect' through humiliating gestures. This is:",
+                options: [
+                    "Teaching respect and hierarchy",
+                    "Cultural ragging and dignity violation",
+                    "Normal social etiquette",
+                    "Traditional college practice"
+                ],
+                correct: 1,
+                caseStudy: true
+            },
+            {
+                question: "What should parents do if their child faces ragging?",
+                options: [
+                    "Advise the child to adjust",
+                    "Immediately contact college authorities and file complaint",
+                    "Wait for the child to handle it",
+                    "Speak to the senior students' parents"
+                ],
+                correct: 1
+            },
+            {
+                question: "Ragging by alumni or outsiders is:",
+                options: [
+                    "Not the college's responsibility",
+                    "Also punishable and should be reported",
+                    "Less serious than student ragging",
+                    "Normal interaction"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: A student with different cultural background is mocked for their accent and food habits. This constitutes:",
+                options: [
+                    "Cultural exchange",
+                    "Friendly teasing",
+                    "Cultural ragging and discrimination",
+                    "Adaptation process"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "What happens to academic records of students found guilty of ragging?",
+                options: [
+                    "No impact on academic records",
+                    "Permanent noting of ragging offense",
+                    "Temporary suspension only",
+                    "Only internal college record"
+                ],
+                correct: 1
+            },
+            {
+                question: "If ragging leads to suicide or serious injury, the legal consequence is:",
+                options: [
+                    "College disciplinary action only",
+                    "Criminal charges including culpable homicide",
+                    "Monetary compensation",
+                    "Community service"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: Seniors force juniors to proxy attend classes for them and threaten consequences for refusal. This is:",
+                options: [
+                    "Academic help",
+                    "Friendship gesture",
+                    "Academic fraud combined with ragging",
+                    "Normal student cooperation"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "What should be the approach of senior students towards juniors?",
+                options: [
+                    "Establish dominance early",
+                    "Maintain formal distance",
+                    "Be supportive mentors and guides",
+                    "Test their limits"
+                ],
+                correct: 2
+            },
+            {
+                question: "Ragging disguised as 'orientation activities' is:",
+                options: [
+                    "Acceptable if planned by college",
+                    "Still ragging and equally punishable",
+                    "Better than direct ragging",
+                    "Educational activity"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: A group of students corner a junior in an empty classroom and verbally abuse them for 'not showing respect'. This incident should be:",
+                options: [
+                    "Handled through dialogue",
+                    "Immediately reported as ragging and intimidation",
+                    "Ignored if no physical harm occurred",
+                    "Mediated by other students"
+                ],
+                correct: 1,
+                caseStudy: true
+            },
+            {
+                question: "What role do student unions play in anti-ragging?",
+                options: [
+                    "Support traditional practices",
+                    "Actively prevent ragging and support victims",
+                    "Stay neutral",
+                    "Focus only on other issues"
+                ],
+                correct: 1
+            },
+            {
+                question: "If someone claims ragging made them 'stronger', this means:",
+                options: [
+                    "Ragging has benefits",
+                    "They survived trauma, but ragging is still wrong",
+                    "Ragging should continue",
+                    "Character was successfully built"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: Seniors make juniors stand outside their rooms all night as 'punishment' for minor mistakes. This is:",
+                options: [
+                    "Disciplinary action",
+                    "Learning consequence",
+                    "Serious physical and psychological ragging",
+                    "Character correction"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "What should be done with students who refuse to participate in ragging?",
+                options: [
+                    "Force them to participate",
+                    "Appreciate and protect their stance",
+                    "Isolate them socially",
+                    "Label them as cowards"
+                ],
+                correct: 1
+            },
+            {
+                question: "Digital evidence of ragging (photos, videos, messages) should be:",
+                options: [
+                    "Deleted immediately",
+                    "Preserved and submitted as evidence",
+                    "Shared for awareness",
+                    "Used for personal protection only"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: Seniors organize a 'fashion show' where juniors are forced to wear embarrassing outfits and walk for entertainment. This event is:",
+                options: [
+                    "Cultural activity",
+                    "Talent showcase",
+                    "Humiliating ragging disguised as event",
+                    "College fest preparation"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "What should colleges do regarding ragging complaints?",
+                options: [
+                    "Handle internally without external involvement",
+                    "Follow UGC guidelines and ensure transparency",
+                    "Suppress to protect reputation",
+                    "Negotiate between parties"
+                ],
+                correct: 1
+            },
+            {
+                question: "If ragging involves substance abuse (forcing alcohol/drugs), it attracts:",
+                options: [
+                    "Only college disciplinary action",
+                    "Additional charges under narcotic laws",
+                    "Rehabilitation program only",
+                    "Warning and counseling"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: A junior reports ragging but later retracts the complaint due to pressure. The institution should:",
+                options: [
+                    "Close the case immediately",
+                    "Continue investigation despite retraction",
+                    "Accept the retraction",
+                    "Blame the complainant"
+                ],
+                correct: 1,
+                caseStudy: true
+            },
+            {
+                question: "What creates a truly safe campus environment?",
+                options: [
+                    "Strict rules only",
+                    "Collective responsibility and zero tolerance culture",
+                    "Fear of punishment",
+                    "Administrative control"
+                ],
+                correct: 1
+            },
+            {
+                question: "Ragging that causes 'mental trauma' includes:",
+                options: [
+                    "Constant fear and anxiety",
+                    "Sleep deprivation and stress",
+                    "Social isolation and humiliation",
+                    "All of the above"
+                ],
+                correct: 3
+            },
+            {
+                question: "Case Study: Seniors create fake social media profiles of juniors and post embarrassing content. This is:",
+                options: [
+                    "Social media prank",
+                    "Digital creativity",
+                    "Cyber ragging and identity theft",
+                    "Harmless joke"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "What should be the message of anti-ragging campaigns?",
+                options: [
+                    "Ragging builds character",
+                    "Zero tolerance - Report, Prevent, Protect",
+                    "Controlled ragging is acceptable",
+                    "Traditional practices should continue"
+                ],
+                correct: 1
+            },
+            {
+                question: "If someone says 'ragging helped me become confident', the appropriate response is:",
+                options: [
+                    "Agree that ragging has benefits",
+                    "Explain that confidence can be built without harm and trauma",
+                    "Encourage ragging for others",
+                    "Support their experience"
+                ],
+                correct: 1
+            },
+            {
+                question: "Case Study: During medical college admission, seniors force juniors to memorize and recite personal details of all seniors. This practice is:",
+                options: [
+                    "Memory enhancement exercise",
+                    "Respect building activity",
+                    "Psychological ragging and invasion of privacy",
+                    "Traditional introduction method"
+                ],
+                correct: 2,
+                caseStudy: true
+            },
+            {
+                question: "The ultimate goal of anti-ragging measures is to:",
+                options: [
+                    "Punish offenders only",
+                    "Create fear among students",
+                    "Ensure safe, supportive, and inclusive campus environment",
+                    "Maintain discipline"
+                ],
+                correct: 2
+            },
+            {
+                question: "What should students remember about ragging and their future?",
+                options: [
+                    "Ragging incidents can affect career and character certificates",
+                    "Past ragging doesn't matter",
+                    "Only current behavior matters",
+                    "Ragging records are confidential"
+                ],
+                correct: 0
+            }
+        ];
+
+        // Quiz state
+        let currentQuestionIndex = 0;
+        let answers = [];
+        let tabSwitchCount = 0;
+        let timeLeft = 2400; // 40 minutes in seconds
+        let timer;
+        let participantData = {};
+        let quizStartTime;
+        let isQuizActive = false;
+        let questionStartTime = Date.now();
+
+        // Anti-cheat measures
+        let isTabActive = true;
+        let suspiciousActivityCount = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing quiz...');
+            setupAntiCheat();
+            
+            const form = document.getElementById('registrationFormElement');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    console.log('Form submitted');
+                    startQuiz(e);
+                });
+                console.log('Form event listener added');
+            } else {
+                console.error('Registration form not found');
+            }
+        });
+
+        function setupAntiCheat() {
+            // Disable right-click context menu
+            document.addEventListener('contextmenu', function(e) {
+                if (isQuizActive) {
+                    e.preventDefault();
+                    showWarning('Context Menu Blocked', 'Right-click is disabled during the quiz.');
+                }
+            });
+
+            // Disable copy/paste and dev tools
+            document.addEventListener('keydown', function(e) {
+                if (isQuizActive && (
+                    e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x') ||
+                    e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                    (e.ctrlKey && e.key === 'u')
+                )) {
+                    e.preventDefault();
+                    showWarning('Action Blocked', 'Copy/paste and developer tools are disabled during the quiz.');
+                }
+            });
+
+            // Disable text selection
+            document.addEventListener('selectstart', function(e) {
+                if (isQuizActive && e.target.tagName !== 'INPUT') {
+                    e.preventDefault();
+                }
+            });
+
+            // Tab visibility detection
+            document.addEventListener('visibilitychange', function() {
+                if (isQuizActive) {
+                    if (document.hidden) {
+                        isTabActive = false;
+                    } else {
+                        if (!isTabActive) {
+                            handleTabSwitch();
+                        }
+                        isTabActive = true;
+                    }
+                }
+            });
+
+            // Window blur/focus detection
+            window.addEventListener('blur', function() {
+                if (isQuizActive && isTabActive) {
+                    setTimeout(() => {
+                        if (!document.hasFocus()) {
+                            handleTabSwitch();
+                        }
+                    }, 100);
+                }
+            });
+
+            // AI pattern detection
+            detectAIPatterns();
+        }
+
+        function detectAIPatterns() {
+            let answerTimes = [];
+            
+            window.recordAnswerTime = function(time) {
+                answerTimes.push(time);
+                if (answerTimes.length > 3) {
+                    let avgTime = answerTimes.slice(-3).reduce((a, b) => a + b) / 3;
+                    if (avgTime < 2000) {
+                        suspiciousActivityCount++;
+                        if (suspiciousActivityCount > 2) {
+                            showWarning('AI Detection Alert', 'Suspiciously fast answering pattern detected. Please ensure you are not using AI assistance.');
+                        }
+                    }
+                }
+            };
+        }
+
+        function handleTabSwitch() {
+            tabSwitchCount++;
+            document.getElementById('tabSwitchCount').textContent = tabSwitchCount;
+            
+            if (tabSwitchCount >= 3) {
+                disqualifyParticipant('Tab Switch Limit Exceeded');
+            } else {
+                showWarning('Tab Switch Warning', `You have switched tabs ${tabSwitchCount}/3 times. Next violation will result in disqualification.`);
+            }
+        }
+
+        function startQuiz(e) {
+            e.preventDefault();
+            console.log('Starting quiz...');
+            
+            // Get form data
+            const nameInput = document.getElementById('participantName');
+            const emailInput = document.getElementById('participantEmail');
+            const collegeInput = document.getElementById('collegeName');
+            const studentIdInput = document.getElementById('studentId');
+            
+            if (!nameInput.value || !emailInput.value || !collegeInput.value || !studentIdInput.value) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            participantData = {
+                name: nameInput.value,
+                email: emailInput.value,
+                college: collegeInput.value,
+                studentId: studentIdInput.value,
+                startTime: new Date().toISOString()
+            };
+            
+            console.log('Participant data:', participantData);
+            
+            // Hide registration form and show quiz
+            document.getElementById('registrationForm').classList.remove('active');
+            document.getElementById('quizContent').classList.add('active');
+            
+            isQuizActive = true;
+            quizStartTime = Date.now();
+            questionStartTime = Date.now();
+            startTimer();
+            displayQuestion();
+            
+            console.log('Quiz started successfully');
+        }
+
+        function startTimer() {
+            timer = setInterval(function() {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function displayQuestion() {
+            const question = quizData[currentQuestionIndex];
+            const questionCard = document.getElementById('questionCard');
+            
+            let questionHtml = `
+                <div class="question-number">Question ${currentQuestionIndex + 1} of 50</div>
+                <div class="question-text">${question.question}</div>
+            `;
+            
+            if (question.caseStudy) {
+                questionHtml += `<div class="case-study">📋 Case Study Question</div>`;
+            }
+            
+            questionHtml += `
+                <div class="options">
+                    ${question.options.map((option, index) => `
+                        <div class="option" onclick="selectOption(${index})" data-index="${index}">
+                            ${option}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            questionCard.innerHTML = questionHtml;
+            
+            // Update progress
+            const progress = ((currentQuestionIndex + 1) / 50) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            
+            // Reset question start time
+            questionStartTime = Date.now();
+            
+            // Hide buttons
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+        }
+
+        function selectOption(optionIndex) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            options[optionIndex].classList.add('selected');
+            
+            answers[currentQuestionIndex] = optionIndex;
+            
+            // Record answer time for AI detection
+            const answerTime = Date.now() - questionStartTime;
+            if (window.recordAnswerTime) {
+                window.recordAnswerTime(answerTime);
+            }
+            
+            // Show appropriate button
+            if (currentQuestionIndex < 49) {
+                document.getElementById('nextBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('submitBtn').style.display = 'inline-block';
+            }
+        }
+
+        function nextQuestion() {
+            if (answers[currentQuestionIndex] === undefined) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+            
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function submitQuiz() {
+            if (answers[currentQuestionIndex] === undefined && currentQuestionIndex < 50) {
+                if (!confirm('You have not answered the current question. Submit anyway?')) {
+                    return;
+                }
+            }
+            
+            clearInterval(timer);
+            isQuizActive = false;
+            
+            // Calculate score
+            let score = 0;
+            answers.forEach((answer, index) => {
+                if (index < quizData.length && answer === quizData[index].correct) {
+                    score++;
+                }
+            });
+            
+            displayResults(score);
+            sendResults(score);
+        }
+
+        function displayResults(score) {
+            document.getElementById('quizContent').classList.remove('active');
+            document.getElementById('resultsScreen').classList.add('active');
+            
+            const percentage = Math.round((score / 50) * 100);
+            let performanceLevel = '';
+            
+            if (percentage >= 90) performanceLevel = 'Excellent Knowledge';
+            else if (percentage >= 75) performanceLevel = 'Good Understanding';
+            else if (percentage >= 60) performanceLevel = 'Average Awareness';
+            else performanceLevel = 'Needs Improvement';
+            
+            document.getElementById('finalScore').textContent = `${score}/50 (${percentage}%)`;
+            document.getElementById('participantInfo').innerHTML = `
+                <strong>${participantData.name}</strong> (${participantData.studentId})<br>
+                ${participantData.college}<br>
+                Email: ${participantData.email}<br>
+                <strong>Performance Level: ${performanceLevel}</strong>
+            `;
+
+            // Update the Google Form link with participant data
+            updateGoogleFormLink(score, percentage);
+        }
+
+        function updateGoogleFormLink(score, percentage) {
+            const googleFormBaseUrl = "https://forms.google.com/your-form-link-here";
+            
+            // You can append parameters to pre-fill the Google Form
+            // Replace 'your-form-link-here' with your actual Google Form URL
+            // Example with pre-filled data:
+            // const googleFormUrl = `${googleFormBaseUrl}?usp=pp_url&entry.123456789=${encodeURIComponent(participantData.name)}&entry.987654321=${encodeURIComponent(score)}&entry.555666777=${encodeURIComponent(participantData.college)}`;
+            
+            const submitButton = document.getElementById('submitResultsBtn');
+            // submitButton.href = googleFormUrl; // Uncomment this when you have your actual form URL
+        }
+
+        function sendResults(score) {
+            const resultData = {
+                participant: participantData,
+                score: score,
+                totalQuestions: 50,
+                percentage: Math.round((score / 50) * 100),
+                answers: answers,
+                tabSwitches: tabSwitchCount,
+                completionTime: new Date().toISOString(),
+                timeSpent: 2400 - timeLeft,
+                suspiciousActivity: suspiciousActivityCount > 0,
+                caseStudyAnswers: answers.filter((_, index) => quizData[index]?.caseStudy).length
+            };
+            
+            console.log('Results to be sent to administrator:', resultData);
+            alert('Your anti-ragging quiz has been completed successfully!');
+        }
+
+        function disqualifyParticipant(reason) {
+            clearInterval(timer);
+            isQuizActive = false;
+            
+            document.body.classList.add('disqualified');
+            document.getElementById('quizContainer').innerHTML = `
+                <div class="quiz-header">
+                    <h1 class="quiz-title" style="color: #dc3545;">DISQUALIFIED</h1>
+                    <p class="quiz-subtitle">Reason: ${reason}</p>
+                </div>
+                <div class="results-card">
+                    <p>You have been disqualified from the Anti-Ragging Awareness Quiz due to violation of quiz rules.</p>
+                    <p>Your attempt has been recorded and reported to the administrator.</p>
+                    <p><strong>Remember:</strong> Just as ragging violates rules and harms others, violating quiz rules shows disregard for guidelines meant to ensure fairness.</p>
+                    <div style="margin-top: 20px;">
+                        <button class="btn" onclick="location.reload()">Start Over</button>
+                    </div>
+                </div>
+            `;
+            
+            const disqualificationData = {
+                participant: participantData,
+                reason: reason,
+                timestamp: new Date().toISOString(),
+                tabSwitches: tabSwitchCount
+            };
+            
+            console.log('Disqualification notice to be sent to administrator:', disqualificationData);
+        }
+
+        function showWarning(title, message) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('warningModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('warningModal').style.display = 'none';
+        }
+
+        function printResults() {
+            window.print();
+        }
+
+        function saveAsPDF() {
+            // Modern browsers support printing to PDF
+            if (window.chrome) {
+                window.print();
+                setTimeout(() => {
+                    alert('Choose "Save as PDF" in the print dialog to save your results as a PDF file.');
+                }, 500);
+            } else {
+                // For other browsers, trigger print dialog
+                window.print();
+                alert('Use your browser\'s "Print to PDF" option to save as PDF.');
+            }
+        }
+    </script>
+</body>
+</html>
